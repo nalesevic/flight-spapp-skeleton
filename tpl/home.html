@@ -1,0 +1,54 @@
+<h1>LOGIN</h1>
+<div class="col-md-6">
+  <form id="login-form" action="#" method="post">
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="email" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" name="password" required class="form-control">
+    </div>
+    <button type="submit" class="btn btn-danger">Submit</button>
+  </form>
+</div>
+
+<script type="text/javascript">
+  $("#login-form").validate({
+    rules: {
+      email: {
+        required: true,
+        email: true
+      },
+      password: {
+        required: true,
+        rangelength: [5, 24]
+      }
+    },
+    messages: {
+      email: {
+        required: "You must enter your email.",
+        email: "You must enter a valid email address"
+      },
+      password: {
+        required: "You must enter your password.",
+        rangelength: "Your password must be between {0} and {1} characters."
+      }
+    },
+    submitHandler: function(form) {
+      $.ajax({
+        url: "rest/users/login",
+        method: "POST",
+        data: $("#login-form").serialize(),
+        success: function(data) {
+          var token = data.token.replace(/['"]+/g, '');
+          window.localStorage.setItem("token", token);
+          location.reload();
+        },
+        error: function(response) {
+
+        }
+      });
+    }
+  });
+</script>

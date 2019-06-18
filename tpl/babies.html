@@ -1,0 +1,117 @@
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <h1 class="h3 mb-0 text-gray-800">Babies</h1>
+  <button id="add_baby_button" type="button" class="btn blue btn-outline" data-toggle="modal" data-target="#baby_modal">
+  <i class="fas fa-plus fa-sm text-white-50"></i> New Baby
+</button>
+
+</div>
+  <div id="babies_container" class="row">
+</div>
+
+<div id="baby_modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <i class='far fa-address-card' style='font-size:36px'></i>
+        <h4 class="modal-title" style="padding-left:10px;">Add Baby</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="baby_form" method="POST" action="#">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>First name</label>
+              <input name="firstname" id="fname" type="text" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Last name</label>
+              <input name="lastname" id="lname" type="text" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Mother's name</label>
+              <input name="mother_name" id="vehicle" type="text" class="form-control">
+            </div>
+            <p id="error"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Add Baby</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Last name</th>
+      <th scope="col">Mother's Name</th>
+    </tr>
+  </thead>
+  <tbody id="babies_body">
+
+  </tbody>
+</table>
+
+<script type="text/javascript">
+  get_babies();
+  $("#baby_form").validate({
+    submitHandler: function(form) {
+      $.ajax({
+        type: "POST",
+        url: "rest/babies",
+        data: $("#baby_form").serialize(),
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("Authorization",
+          window.localStorage.getItem("token")); //get token from localStorage andsend it in the header of the request
+        },
+        success: function(data) {
+            location.reload();
+          }
+      })
+    }
+  });
+
+  function get_babies(){
+  $.ajax({
+   type: 'GET',
+   url: 'rest/babies',
+   dataType: "json",
+   beforeSend: function(xhr) {
+   xhr.setRequestHeader ("Authorization",
+   window.localStorage.getItem('token'));
+   },
+   success: function(data) {
+    var html = '';
+    for(var i = 0; i < data.length; i++){
+      html += '<tr> <td>' + data[i].firstname + '</td>';
+      html += '<td>' + data[i].lastname + '</td>';
+      html += '<td>' + data[i].mother + '</td>';
+      html += '<td><button type="button" class="btn btn-danger" onclick="delete_baby('+data[i].id+');">Delete</button></td> </tr>';
+      }
+      $('#babies_body').html(html);
+    }
+  });
+  }
+
+  function delete_baby(id) {
+    if (confirm("Delete baby with id " + id + "?")){
+      $.ajax({
+        url: "rest/babies/"+id,
+        method: "DELETE"
+      }).done(function( msg ) {
+        $('#baby_'+id).remove();
+        $('.table').DataTable().draw();
+        get_babies();
+      }).fail(function( jqXHR, textStatus ) {
+        alert( "Request failed: " + textStatus );
+      });
+    }
+    location.reload();
+  }
+  </script>
