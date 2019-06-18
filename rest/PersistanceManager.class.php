@@ -55,6 +55,15 @@ class PersistanceManager{
       $baby['id'] = $this->pdo->lastInsertId();
   }
 
+  public function get_baby($id){
+    $query = "SELECT id, firstname, lastname, mother FROM babies WHERE id = :id";
+    $statement = $this->pdo->prepare($query);
+    $statement->execute(['id' => $id]);
+    $baby = $statement->fetch();
+    return $baby;
+  }
+
+
   public function get_babies(){
     $query = "SELECT * FROM babies";
     return $this->pdo->query($query)->fetchAll();
@@ -63,7 +72,7 @@ class PersistanceManager{
   public function update_baby($id, $request){
     $firstname = $request["firstname"];
     $lastname = $request["lastname"];
-    $mother = $request["mother"];
+    $mother = $request["mother_name"];
     $query = "UPDATE babies SET firstname = :firstname, lastname = :lastname, mother = :mother WHERE id = :id";
     $statement = $this->pdo->prepare($query);
     $statement->execute(["id" => $id, "firstname" => $firstname, "lastname" => $lastname, "mother" => $mother]);

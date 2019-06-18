@@ -43,6 +43,7 @@
         success: function(data) {
           var token = data.token.replace(/['"]+/g, '');
           window.localStorage.setItem("token", token);
+          window.location.href = "#babies";
           location.reload();
         },
         error: function(response) {

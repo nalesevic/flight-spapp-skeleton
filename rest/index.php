@@ -74,6 +74,12 @@ Flight::route('POST /babies', function(){
   }
 });
 
+Flight::route('GET /babies/@id', function($id){
+  $request = Flight::request()->data->getData();
+  $baby = Flight::pm()->get_baby($id, $request);
+  Flight::json($baby);
+});
+
 Flight::route('POST /babies/@id', function($id){
   $request = Flight::request()->data->getData();
   Flight::pm()->update_baby($id, $request);

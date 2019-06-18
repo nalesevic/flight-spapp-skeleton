@@ -45,6 +45,46 @@
   </div>
 </div>
 
+<!-- Modal content EDIT-->
+<div id="updateBaby" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <i class='far fa-address-card' style='font-size:36px'></i>
+        <h4 class="modal-title" style="padding-left:10px;">Update Baby</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="update_baby_form" method="POST" action="">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Baby ID</label>
+              <input name="id" id="id" type="text" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+              <label>First name</label>
+              <input name="lastname" id="fname" type="text" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Last name</label>
+              <input name="firstname" id="lname" type="text" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Mother's name</label>
+              <input name="mother_name" id="mother_name" type="text" class="form-control">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" onclick="update_baby()">Update Baby</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <table class="table">
   <thead>
     <tr>
@@ -77,6 +117,21 @@
     }
   });
 
+  function get_baby(id) {
+    $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "rest/babies/" + id,
+      success: function(data) {
+        console.log(data);
+        $("#updateBaby #id").val(data.id);
+        $("#updateBaby #fname").val(data.firstname);
+        $("#updateBaby #lname").val(data.lastname);
+        $("#updateBaby #mother_name").val(data.mother);
+      }
+    })
+  }
+
   function get_babies(){
   $.ajax({
    type: 'GET',
@@ -92,11 +147,29 @@
       html += '<tr> <td>' + data[i].firstname + '</td>';
       html += '<td>' + data[i].lastname + '</td>';
       html += '<td>' + data[i].mother + '</td>';
+      html += '  <td><button onclick="get_baby('+data[i].id+')" class="btn btn-warning" data-toggle="modal" data-target="#updateBaby">Edit</button></td>';
       html += '<td><button type="button" class="btn btn-danger" onclick="delete_baby('+data[i].id+');">Delete</button></td> </tr>';
       }
       $('#babies_body').html(html);
     }
   });
+  }
+
+  function update_baby() {
+    var id = $("#updateBaby #id").val();
+    $("#update_baby_form").validate({
+      submitHandler: function(form) {
+        $.ajax({
+          url: "rest/babies/"+id,
+          type: "POST",
+          data: $("#update_baby_form").serialize(),
+          success: function(data) {
+            get_babies();
+            location.reload();
+          }
+        })
+      }
+    });
   }
 
   function delete_baby(id) {
